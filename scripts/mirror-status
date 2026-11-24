@@ -1,0 +1,35 @@
+#!/bin/bash
+# Freshness of the mirror. Installed as /usr/local/bin/mirror-status.
+# Exit 0: fresh; 1: stale (archive older than MAX_ARCHIVE_H hours or debian-cd older than MAX_CD_H); 2: no trace.
+# For monitoring: UserParameter=mirror.status,/usr/local/bin/mirror-status --quiet; echo $?
+set -uo pipefail
+NAME=mirror.blue3.com.br
+TO=/srv/mirror/debian
+TRACE=$TO/project/trace/$NAME
+CD_LAST=/var/lib/mirror/debian-cd.last-sync
+MAX_ARCHIVE_H=${MAX_ARCHIVE_H:-12}
+MAX_CD_H=${MAX_CD_H:-48}
+quiet=0; [ "${1:-}" = --quiet ] && quiet=1
+say() { [ $quiet = 1 ] || echo "$@"; }
+worse() { [ "$1" -gt "$rc" ] && rc=$1; }
+rc=0; now=$(date +%s)
+
+if [ -r "$TRACE" ]; then
+    when=$(head -1 "$TRACE"); t=$(date -d "$when" +%s 2>/dev/null || echo 0); age=$(( (now - t) / 3600 ))
+    say "archive:   last sync $when (${age} h ago)"
+    [ "$age" -le "$MAX_ARCHIVE_H" ] || worse 1
+else
+    say "archive:   no trace for $NAME yet"; worse 2
+fi
+[ -e "$TO/Archive-Update-in-Progress-$NAME" ] && say "archive:   a sync is running"
+
+if [ -r "$CD_LAST" ]; then
+    when=$(cat "$CD_LAST"); t=$(date -d "$when" +%s 2>/dev/null || echo 0); age=$(( (now - t) / 3600 ))
+    say "debian-cd: last sync $when (${age} h ago)"
+    [ "$age" -le "$MAX_CD_H" ] || worse 1
+else
+    say "debian-cd: never synced"; worse 1
+fi
+
+say "disk:      $(df -h --output=used,size,pcent /srv | tail -1 | tr -s ' ')"
+exit $rc

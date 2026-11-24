@@ -1,0 +1,23 @@
+[Unit]
+Description=Debian archive sync (ftpsync), started when the upstream trace changed
+Documentation=https://github.com/samirhvbr/debian-mirror
+RequiresMountsFor=/srv/mirror
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=mirror
+Group=mirror
+Environment=LOGNAME=mirror HOME=/var/lib/mirror
+# compares the upstream trace serial with ours and execs "ftpsync sync:archive:" in the foreground when they differ
+ExecStart=/usr/bin/ftpsync-cron
+TimeoutStartSec=12h
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/srv/mirror/debian /var/log/ftpsync /var/lib/mirror

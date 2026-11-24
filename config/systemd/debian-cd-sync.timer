@@ -1,0 +1,10 @@
+[Unit]
+Description=Sync debian-cd twice a day
+
+[Timer]
+OnCalendar=*-*-* 05,17:10
+RandomizedDelaySec=10min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

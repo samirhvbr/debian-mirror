@@ -1,0 +1,4 @@
+// Installed as /etc/apt/apt.conf.d/20auto-upgrades: daily package lists and unattended security updates
+// (unattended-upgrades' default origins: Debian and Debian-Security of the running release).
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";

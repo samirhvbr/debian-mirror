@@ -1,0 +1,3 @@
+# real management sources (public repo: only the example is tracked)
+config/nftables/mgmt.nft
+*.local

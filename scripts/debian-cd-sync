@@ -1,0 +1,18 @@
+#!/bin/bash
+# Mirror debian-cd: the released installation and live images of every architecture (current and current-live).
+# Installed as /usr/local/sbin/debian-cd-sync, run as user "mirror" by debian-cd-sync.service.
+# rsync options follow https://www.debian.org/CD/mirroring/: hard links kept, deletions only after the transfer,
+# and --delay-updates, so a client never downloads from a half-updated directory.
+set -euo pipefail
+SRC=${DEBIAN_CD_SOURCE:-rsync://ftp.br.debian.org/debian-cd/}
+DST=${DEBIAN_CD_TARGET:-/srv/mirror/debian-cd/}
+STATE=/var/lib/mirror
+mkdir -p "$STATE/lock"
+exec 9>"$STATE/lock/debian-cd-sync.lock"
+flock -n 9 || { echo "another debian-cd sync is running"; exit 0; }
+rsync --recursive --links --perms --times --hard-links --safe-links \
+      --delete --delete-after --delay-updates \
+      --timeout=600 --contimeout=60 --stats \
+      "$SRC" "$DST"
+# kept outside the tree: anything written inside it would be deleted by the next --delete
+date -u +%FT%TZ > "$STATE/debian-cd.last-sync"

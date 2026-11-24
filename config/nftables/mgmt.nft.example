@@ -1,0 +1,14 @@
+# Copy to /etc/nftables.d/mgmt.nft and list the real sources. Included inside "table inet filter".
+set mgmt_v4 {
+    type ipv4_addr; flags interval
+    elements = { 10.0.0.0/8, 100.64.0.0/10, 172.16.0.0/12, 192.168.0.0/16, 198.51.100.10 }
+}
+set mgmt_v6 {
+    type ipv6_addr; flags interval
+    elements = { fe80::/10 }
+}
+# the Zabbix server, for zabbix-agent2 on 10050/tcp
+set monitor_v4 {
+    type ipv4_addr; flags interval
+    elements = { 198.51.100.20 }
+}

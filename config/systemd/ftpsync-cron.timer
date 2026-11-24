@@ -1,0 +1,11 @@
+[Unit]
+Description=Check the Debian upstream trace every 5 minutes
+
+[Timer]
+OnBootSec=5min
+# counted from the end of the previous run, so two syncs never overlap (ftpsync also holds its own lock)
+OnUnitInactiveSec=5min
+RandomizedDelaySec=30
+
+[Install]
+WantedBy=timers.target

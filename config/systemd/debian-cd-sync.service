@@ -1,0 +1,21 @@
+[Unit]
+Description=Debian CD/DVD image sync (debian-cd)
+Documentation=https://github.com/samirhvbr/debian-mirror
+RequiresMountsFor=/srv/mirror
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=mirror
+Group=mirror
+ExecStart=/usr/local/sbin/debian-cd-sync
+TimeoutStartSec=12h
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/srv/mirror/debian-cd /var/lib/mirror

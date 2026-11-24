@@ -1,0 +1,5 @@
+# Blue3 NTP first (Blue3 rule for every server): internal address, then the name, then the public address.
+# Installed as /etc/chrony/sources.d/blue3.sources; the Debian pool in chrony.conf stays as the fallback.
+server 100.64.66.230 iburst prefer
+server ntp.blue3.com.br iburst
+server 170.233.231.230 iburst
